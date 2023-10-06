@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/Theme/pallete.dart';
+import 'package:reddit/core/common/loader.dart';
 import 'package:reddit/core/common/sign_in_button.dart';
 import 'package:reddit/core/constants/constants.dart';
-import 'package:reddit/core/loader.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
 
 class LoginScreen extends ConsumerWidget {
