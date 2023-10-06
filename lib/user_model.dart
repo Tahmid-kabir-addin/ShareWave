@@ -36,6 +36,7 @@ class UserModel {
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
+    List<String> awards = (map['awards'] as List<dynamic>).map((award) => award.toString()).toList();
     return UserModel(
       name: map['name'] as String,
       profilePic: map['profilePic'] as String,
@@ -43,7 +44,7 @@ class UserModel {
       uid: map['uid'] as String,
       isAuthenticated: map['isAuthenticated'] as bool,
       karma: map['karma'] as int,
-      awards: map['awards'] as List<String>,
+      awards: awards,
     );
   }
 

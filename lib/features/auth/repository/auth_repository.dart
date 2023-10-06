@@ -10,6 +10,7 @@ import 'package:reddit/core/providers/firebase_providers.dart';
 import 'package:reddit/core/type_defs.dart';
 import 'package:reddit/user_model.dart';
 
+// ref.read(): when you need to read the value only once
 final authRepositoryProvider = Provider((ref) => AuthRepository(
     firestore: ref.read(firestoreProvider),
     auth: ref.read(authProvider),
@@ -28,7 +29,8 @@ class AuthRepository {
         _firestore = firestore,
         _googleSignIn = googleSignIn;
 
-  CollectionReference get _users => _firestore.collection(FirebaseConstants.usersCollection);
+  CollectionReference get _users =>
+      _firestore.collection(FirebaseConstants.usersCollection);
 
   FutureEither<UserModel> signInWithGoogle() async {
     try {
@@ -58,9 +60,7 @@ class AuthRepository {
         await _users.doc(userCredential.user!.uid).set(userModel.toMap());
         // return right(userModel);
       } else {
-        // print(getUserData(userCredential.user!.uid).first);
         userModel = await getUserData(userCredential.user!.uid).first;
-        print("hello" + userModel.toString());
       }
       return right(userModel);
     } catch (E) {
@@ -73,4 +73,3 @@ class AuthRepository {
     return _users.doc(uid).snapshots().map((event) => UserModel.fromMap(event.data() as Map<String, dynamic>));
   }
 }
-

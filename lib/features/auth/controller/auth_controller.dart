@@ -4,15 +4,28 @@ import 'package:reddit/features/auth/repository/auth_repository.dart';
 import 'package:reddit/user_model.dart';
 import 'package:reddit/utils.dart';
 
-final authControllerProvider = Provider((ref) => AuthController(authRepository: ref.read(authRepositoryProvider)));
+final userProvider = StateProvider<UserModel?>((ref) => null);
 
-class AuthController {
+// ref.watch: every time the authRepositoryProvider changes it will update
+final authControllerProvider = StateNotifierProvider<AuthController, bool>((ref) =>
+    AuthController(authRepository: ref.watch(authRepositoryProvider), ref: ref));
+
+class AuthController extends StateNotifier<bool> {
   late final AuthRepository _authRepository;
+  final Ref _ref;
 
-  AuthController({required AuthRepository authRepository}): _authRepository = authRepository;
+  AuthController({required AuthRepository authRepository, required Ref ref})
+      : _authRepository = authRepository,
+        _ref = ref,
+        super(false);
 
   void signInWithGoogle(BuildContext context) async {
+    state = true;
     final user = await _authRepository.signInWithGoogle();
-    user.fold((l) => showSnackBar(context, l.message), (r) => null);
+    state = false;
+    user.fold(
+        (l) => showSnackBar(context, l.message),
+        (userModel) =>
+            _ref.read(userProvider.notifier).update((state) => userModel));
   }
 }
