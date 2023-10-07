@@ -8,13 +8,16 @@ import 'package:reddit/core/constants/firebase_constants.dart';
 import 'package:reddit/core/failure.dart';
 import 'package:reddit/core/providers/firebase_providers.dart';
 import 'package:reddit/core/type_defs.dart';
-import 'package:reddit/user_model.dart';
+import 'package:reddit/models/user_model.dart';
 
 // ref.read(): when you need to read the value only once
-final authRepositoryProvider = Provider((ref) => AuthRepository(
-    firestore: ref.read(firestoreProvider),
-    auth: ref.read(authProvider),
-    googleSignIn: ref.read(googleSignInProvider)));
+final authRepositoryProvider = Provider((ref) {
+  print("Inside authRepositoryProvider");
+  return AuthRepository(
+      firestore: ref.read(firestoreProvider),
+      auth: ref.read(authProvider),
+      googleSignIn: ref.read(googleSignInProvider));
+});
 
 class AuthRepository {
   late final FirebaseFirestore _firestore;
@@ -36,6 +39,8 @@ class AuthRepository {
 
   FutureEither<UserModel> signInWithGoogle() async {
     try {
+      print('Inside signInWithGoogle of auth_repository class');
+
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       final googleAuth = (await googleUser?.authentication);
@@ -49,6 +54,7 @@ class AuthRepository {
       UserModel userModel;
       // print(userCredential.user?.email);
       if (userCredential.additionalUserInfo!.isNewUser) {
+        print("new user auth_repo");
         userModel = UserModel(
             name: userCredential.user!.displayName ?? 'No Name',
             profilePic:
@@ -62,6 +68,7 @@ class AuthRepository {
         await _users.doc(userCredential.user!.uid).set(userModel.toMap());
         // return right(userModel);
       } else {
+        print("old user calling getUserData auth_repo");
         userModel = await getUserData(userCredential.user!.uid).first;
       }
       return right(userModel);
@@ -72,6 +79,8 @@ class AuthRepository {
   }
 
   Stream<UserModel> getUserData(String uid) {
-    return _users.doc(uid).snapshots().map((event) => UserModel.fromMap(event.data() as Map<String, dynamic>));
+    // print("inside getUserData auth_repository");
+    return _users.doc(uid).snapshots().map(
+        (event) => UserModel.fromMap(event.data() as Map<String, dynamic>));
   }
 }

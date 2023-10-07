@@ -8,7 +8,7 @@ import 'package:reddit/core/common/loader.dart';
 import 'package:reddit/core/routers.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/firebase_options.dart';
-import 'package:reddit/user_model.dart';
+import 'package:reddit/models/user_model.dart';
 import 'package:routemaster/routemaster.dart';
 
 void main() async {

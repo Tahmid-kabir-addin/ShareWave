@@ -56,10 +56,10 @@ class LoginScreen extends ConsumerWidget {
                     height: 400,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                SignInButton(),
+                const SignInButton(),
               ],
             ),
     );
