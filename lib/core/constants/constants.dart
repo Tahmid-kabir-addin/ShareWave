@@ -4,5 +4,5 @@ class Constants {
   static const googlePath = 'assets/images/google.png';
 
   static const avatarDefault = 'https://www.redditstatic.com/avatars/avatar_default_12_545452.png';
-  static const bannerDefault = 'https://i.pinimg.com/564x/ae/77/c7/ae77c7a5dda59ad23d2e695251b171ad.jpg';
+  static const bannerDefault = 'https://images.pexels.com/photos/326055/pexels-photo-326055.jpeg?cs=srgb&dl=pexels-pixabay-326055.jpg&fm=jpg';
 }
