@@ -11,6 +11,10 @@ import 'package:reddit/models/community_model.dart';
 import 'package:reddit/utils.dart';
 import 'package:routemaster/routemaster.dart';
 
+final searchCommunityProvider = StreamProvider.family((ref, String query) {
+  return ref.watch(communityControllerProvider.notifier).searchCommunity(query);
+});
+
 final userCommunitiesProvider = StreamProvider((ref) {
   return ref.watch(communityControllerProvider.notifier).getUserCommunities();
 });
@@ -74,6 +78,10 @@ class CommunityController extends StateNotifier<bool> {
 
   Stream<Community> getCommunityByName(String name) {
     return _communityRepository.getCommunityByName(name);
+  }
+
+  Stream<List<Community>> searchCommunity(String query) {
+    return _communityRepository.searchCommunity(query);
   }
 
   void editCommunity(
