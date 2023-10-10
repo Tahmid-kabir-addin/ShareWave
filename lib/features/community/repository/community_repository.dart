@@ -30,7 +30,6 @@ class CommunityRepository {
 
       // Check if a community with the same name already exists.
       if (communityDoc.exists) {
-        print('hello');
         throw 'Community With The Same Name Already Exists!';
       }
 
@@ -59,5 +58,13 @@ class CommunityRepository {
     return _communities.doc(name).snapshots().map((event) {
       return Community.fromMap(event.data() as Map<String, dynamic>);
     });
+  }
+
+  FutureVoid editCommunity(Community community) async {
+    try {
+      return right(_communities.doc(community.name).update(community.toMap()));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
   }
 }
