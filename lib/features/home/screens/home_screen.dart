@@ -4,12 +4,17 @@ import 'package:reddit/Theme/pallete.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/home/delegates/search_community_delegates.dart';
 import 'package:reddit/features/home/drawers/community_list_drawer.dart';
+import 'package:reddit/features/home/drawers/profile_icon_drawer.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   void displayDrawer(BuildContext context) {
     Scaffold.of(context).openDrawer();
+  }
+
+  void displayEndDrawer(BuildContext context) {
+    Scaffold.of(context).openEndDrawer();
   }
 
   @override
@@ -29,11 +34,15 @@ class HomeScreen extends ConsumerWidget {
                 context: context, delegate: SearchCommunityDelegates(ref: ref)),
             icon: const Icon(Icons.search),
           ),
-          IconButton(
-            icon: CircleAvatar(
-              backgroundImage: NetworkImage(user!.profilePic),
-            ),
-            onPressed: () {},
+          Builder(
+            builder: (context) {
+              return IconButton(
+                icon: CircleAvatar(
+                  backgroundImage: NetworkImage(user!.profilePic),
+                ),
+                onPressed: () => displayEndDrawer(context),
+              );
+            }
           ),
         ],
         title: const Text(
@@ -44,6 +53,8 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
       drawer: const CommunityListDrawer(),
+      endDrawer: const ProfileIconDrawer(),
     );
   }
 }
+
