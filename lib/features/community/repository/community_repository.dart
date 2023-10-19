@@ -68,6 +68,18 @@ class CommunityRepository {
     }
   }
 
+  FutureVoid addModsToCommunity(String communityName, List<String> uids) async {
+    try {
+      return right(_communities.doc(communityName).update({
+        'mods': uids,
+      }));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+
+
   Stream<List<Community>> searchCommunity(String query) {
     return _communities
         .where('name',
@@ -85,4 +97,24 @@ class CommunityRepository {
       return communities;
     });
   }
+  FutureVoid joinCommunity(String communityName, String uid) async {
+    try {
+      return right(_communities.doc(communityName).update({
+        'members': FieldValue.arrayUnion([uid]),
+      }));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  FutureVoid leaveCommunity(String communityName, String uid) async {
+    try {
+      return right(_communities.doc(communityName).update({
+        'members': FieldValue.arrayRemove([uid]),
+      }));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
 }

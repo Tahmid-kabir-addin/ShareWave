@@ -9,7 +9,6 @@ class SearchCommunityDelegates extends SearchDelegate {
   final WidgetRef ref;
 
   SearchCommunityDelegates({required this.ref});
-
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [

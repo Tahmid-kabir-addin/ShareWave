@@ -45,6 +45,8 @@ dependencies:
   routemaster: ^1.0.1
   dotted_border: ^2.1.0
   file_picker: ^5.5.0
+  uuid: ^4.1.0
+  any_link_preview: ^3.0.1
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +73,11 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  fonts:
+    - family: MyFlutterApp
+      fonts:
+        - asset: assets/fonts/MyFlutterApp.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

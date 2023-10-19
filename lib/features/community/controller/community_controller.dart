@@ -71,6 +71,21 @@ class CommunityController extends StateNotifier<bool> {
     });
   }
 
+  void joinCommunity(BuildContext context, Community community) async {
+    final uid = _ref.watch(userProvider)?.uid;
+    if (!community.members.contains(uid)) {
+      print("${community.name} ${uid!}");
+      final res = await _communityRepository.joinCommunity(community.name, uid);
+      res.fold((l) => showSnackBar(context, l.message),
+              (r) => showSnackBar(context, 'Community Joined Successfully!'));
+    } else {
+      final res =
+      await _communityRepository.leaveCommunity(community.name, uid!);
+      res.fold((l) => showSnackBar(context, l.message),
+              (r) => showSnackBar(context, "Community Left Successfully!"));
+    }
+  }
+
   Stream<List<Community>> getUserCommunities() {
     final uid = _ref.read(userProvider)!.uid;
     return _communityRepository.getUserCommunities(uid);
@@ -109,5 +124,9 @@ class CommunityController extends StateNotifier<bool> {
     state = false;
     res.fold((l) => showSnackBar(context, l.message),
         (r) => Routemaster.of(context).pop());
+  }
+  void addModsToCommunity(BuildContext context, String communityName, List<String> uids) async {
+    final res = await _communityRepository.addModsToCommunity(communityName, uids);
+    res.fold((l) => showSnackBar(context, l.message), (r) => Routemaster.of(context).pop());
   }
 }

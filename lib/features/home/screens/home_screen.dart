@@ -1,14 +1,22 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/Theme/pallete.dart';
+import 'package:reddit/core/constants/constants.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/home/delegates/search_community_delegates.dart';
 import 'package:reddit/features/home/drawers/community_list_drawer.dart';
 import 'package:reddit/features/home/drawers/profile_icon_drawer.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  ConsumerState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  int _page = 0;
   void displayDrawer(BuildContext context) {
     Scaffold.of(context).openDrawer();
   }
@@ -17,8 +25,14 @@ class HomeScreen extends ConsumerWidget {
     Scaffold.of(context).openEndDrawer();
   }
 
+  void onPageChange(int page) {
+    setState(() {
+      _page = page;
+    });
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
     return Scaffold(
       appBar: AppBar(
@@ -34,16 +48,14 @@ class HomeScreen extends ConsumerWidget {
                 context: context, delegate: SearchCommunityDelegates(ref: ref)),
             icon: const Icon(Icons.search),
           ),
-          Builder(
-            builder: (context) {
-              return IconButton(
-                icon: CircleAvatar(
-                  backgroundImage: NetworkImage(user!.profilePic),
-                ),
-                onPressed: () => displayEndDrawer(context),
-              );
-            }
-          ),
+          Builder(builder: (context) {
+            return IconButton(
+              icon: CircleAvatar(
+                backgroundImage: NetworkImage(user!.profilePic),
+              ),
+              onPressed: () => displayEndDrawer(context),
+            );
+          }),
         ],
         title: const Text(
           "Home",
@@ -52,9 +64,23 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ),
+      body: Constants.tabWidgets[_page],
       drawer: const CommunityListDrawer(),
       endDrawer: const ProfileIconDrawer(),
+      bottomNavigationBar: CupertinoTabBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+          ),
+        ],
+        onTap: onPageChange,
+        currentIndex: _page,
+        activeColor: Colors.white,
+        backgroundColor: Pallete.darkModeAppTheme.backgroundColor,
+      ),
     );
   }
 }
-

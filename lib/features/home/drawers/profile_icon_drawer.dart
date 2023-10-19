@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:reddit/Theme/pallete.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
+import 'package:routemaster/routemaster.dart';
 
 class ProfileIconDrawer extends ConsumerWidget {
   const ProfileIconDrawer({super.key});
@@ -11,6 +11,10 @@ class ProfileIconDrawer extends ConsumerWidget {
     final user = ref.watch(userProvider);
     void logOut() {
       ref.watch(authControllerProvider.notifier).logOut();
+    }
+
+    void navigateToUserProfile(BuildContext context) {
+      Routemaster.of(context).push('/user/${user?.uid}');
     }
     return Drawer(
       child: SafeArea(
@@ -34,7 +38,7 @@ class ProfileIconDrawer extends ConsumerWidget {
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text('My Profile'),
-              onTap: () {},
+              onTap: () => navigateToUserProfile(context),
             ),
             ListTile(
               leading: const Icon(
@@ -48,6 +52,5 @@ class ProfileIconDrawer extends ConsumerWidget {
         ),
       ),
     );
-    ;
   }
 }
