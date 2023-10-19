@@ -39,4 +39,12 @@ class PostRepository {
             .map((e) => Post.fromMap(e.data() as Map<String, dynamic>))
             .toList());
   }
+
+  FutureVoid deletePost(Post post) async {
+    try {
+      return right(_posts.doc(post.id).delete());
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
 }

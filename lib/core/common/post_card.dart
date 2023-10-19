@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/Theme/pallete.dart';
 import 'package:reddit/core/constants/constants.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
+import 'package:reddit/features/post/controller/post_controller.dart';
 import 'package:reddit/models/post_model.dart';
 
 class PostCard extends ConsumerWidget {
@@ -17,6 +18,10 @@ class PostCard extends ConsumerWidget {
     final isTypeText = post.type == 'text';
     final isTypeLink = post.type == 'link';
     final user = ref.watch(userProvider)!;
+
+    void deletePost(Post post) {
+      ref.watch(postControllerProvider.notifier).deletePost(post, context);
+    }
 
     return Column(
       children: [
@@ -74,7 +79,7 @@ class PostCard extends ConsumerWidget {
                               ),
                               if (post.uid == user.uid)
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: () => deletePost(post),
                                   icon: Icon(
                                     Icons.delete,
                                     color: Pallete.redColor,
@@ -86,7 +91,7 @@ class PostCard extends ConsumerWidget {
                             padding: const EdgeInsets.all(10.0),
                             child: Text(
                               post.title,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -102,13 +107,16 @@ class PostCard extends ConsumerWidget {
                               ),
                             ),
                           if (isTypeLink)
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.35,
-                              width: double.infinity,
-                              child: AnyLinkPreview(
-                                link: post.link!,
-                                displayDirection:
-                                    UIDirection.uiDirectionHorizontal,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                              child: SizedBox(
+                                height: 120,
+                                width: double.infinity,
+                                child: AnyLinkPreview(
+                                  link: post.link!,
+                                  displayDirection:
+                                      UIDirection.uiDirectionHorizontal,
+                                ),
                               ),
                             ),
                           if (isTypeText)

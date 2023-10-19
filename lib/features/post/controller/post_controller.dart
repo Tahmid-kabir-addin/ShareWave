@@ -147,16 +147,22 @@ class PostController extends StateNotifier<bool> {
         showSnackBar(context, "Posted Successfully");
         Routemaster.of(context).pop();
         state = true;
-
       });
     });
   }
 
   Stream<List<Post>> getUserPosts(List<Community> communities) {
     if (communities.isNotEmpty) {
-
       return _postRepository.getUserPosts(communities);
     }
     return Stream.value([]);
+  }
+
+  void deletePost(Post post, BuildContext context) async {
+    state = false;
+    final res = await _postRepository.deletePost(post);
+    state = true;
+    res.fold((l) => showSnackBar(context, "Deletion Failed!"),
+        (r) => showSnackBar(context, "Successfully Deleted!"));
   }
 }

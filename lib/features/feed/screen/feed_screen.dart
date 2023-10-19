@@ -23,7 +23,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   final post = data[index];
-                  print(post);
+                  // print(post);
                   return PostCard(post: post);
                 },
               );
