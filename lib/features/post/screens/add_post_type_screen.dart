@@ -65,14 +65,15 @@ class _AddPostTypeScreenState extends ConsumerState<AddPostTypeScreen> {
     }
   }
 
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  //
-  //   _titleController.dispose();
-  //   _descriptionController.dispose();
-  //   _linkController.dispose();
-  // }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _linkController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

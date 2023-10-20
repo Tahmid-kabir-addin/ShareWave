@@ -9,7 +9,7 @@ class SignInButton extends ConsumerWidget {
   
   void signInWithGoogle(BuildContext context, WidgetRef ref) {
     print("Inside SignInWithGoogle sign_in_button class");
-    ref.read(authControllerProvider.notifier).signInWithGoogle(context);
+    ref.watch(authControllerProvider.notifier).signInWithGoogle(context);
   }
   
   @override

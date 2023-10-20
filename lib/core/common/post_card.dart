@@ -23,6 +23,12 @@ class PostCard extends ConsumerWidget {
       ref.watch(postControllerProvider.notifier).deletePost(post, context);
     }
 
+    void updateVote(String uid, Post post, String voteType) {
+      ref
+          .watch(postControllerProvider.notifier)
+          .updateVote(post, context, voteType, uid);
+    }
+
     return Column(
       children: [
         Container(
@@ -108,7 +114,8 @@ class PostCard extends ConsumerWidget {
                             ),
                           if (isTypeLink)
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15.0),
                               child: SizedBox(
                                 height: 120,
                                 width: double.infinity,
@@ -140,7 +147,8 @@ class PostCard extends ConsumerWidget {
                         Row(
                           children: [
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () =>
+                                  updateVote(user.uid, post, 'upVote'),
                               icon: Icon(
                                 Constants.up,
                                 size: 30,
@@ -156,7 +164,8 @@ class PostCard extends ConsumerWidget {
                               ),
                             ),
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () =>
+                                  updateVote(user.uid, post, 'downVote'),
                               icon: Icon(
                                 Constants.down,
                                 size: 30,

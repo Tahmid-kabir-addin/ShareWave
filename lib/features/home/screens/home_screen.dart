@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/Theme/pallete.dart';
 import 'package:reddit/core/constants/constants.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
+import 'package:reddit/features/community/controller/community_controller.dart';
 import 'package:reddit/features/home/delegates/search_community_delegates.dart';
 import 'package:reddit/features/home/drawers/community_list_drawer.dart';
 import 'package:reddit/features/home/drawers/profile_icon_drawer.dart';
@@ -32,8 +33,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   @override
+  void initState() {
+    // final communities = ref.read(userCommunitiesProvider);
+    // print(communities);
+    // setState(() {
+    //
+    // });
+    super.initState();
+  }
+
+
+
+  @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
+
     return Scaffold(
       appBar: AppBar(
         leading: Builder(builder: (context) {
@@ -68,7 +82,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       drawer: const CommunityListDrawer(),
       endDrawer: const ProfileIconDrawer(),
       bottomNavigationBar: CupertinoTabBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
           ),

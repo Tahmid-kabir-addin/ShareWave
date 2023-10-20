@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:reddit/core/failure.dart';
 import 'package:reddit/core/providers/storage_repositoy.dart';
+import 'package:reddit/core/type_defs.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/post/repository/post_repository.dart';
 import 'package:reddit/models/community_model.dart';
@@ -164,5 +167,25 @@ class PostController extends StateNotifier<bool> {
     state = true;
     res.fold((l) => showSnackBar(context, "Deletion Failed!"),
         (r) => showSnackBar(context, "Successfully Deleted!"));
+  }
+
+  void updateVote(
+      Post post, BuildContext context, String voteType, String uid) async {
+    final Either<Failure, void> res;
+    if (voteType == 'upVote') {
+      if (post.upVotes.contains(uid)) {
+        res = await _postRepository.updateUpVote(post, uid, true);
+      } else {
+        res = await _postRepository.updateUpVote(post, uid, false);
+      }
+    } else {
+      if (post.downVotes.contains(uid)) {
+        res = await _postRepository.updateDownVote(post, uid, true);
+      } else {
+        res = await _postRepository.updateDownVote(post, uid, false);
+      }
+    }
+    res.fold((l) => showSnackBar(context, 'Voting Failed!'),
+        (r) => showSnackBar(context, 'Vote Updated Successfully!'));
   }
 }

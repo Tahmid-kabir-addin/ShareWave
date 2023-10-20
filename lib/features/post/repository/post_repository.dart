@@ -7,6 +7,7 @@ import 'package:reddit/core/providers/firebase_providers.dart';
 import 'package:reddit/core/type_defs.dart';
 import 'package:reddit/models/community_model.dart';
 import 'package:reddit/models/post_model.dart';
+import 'package:reddit/models/user_model.dart';
 
 final postRepositoryProvider = Provider((ref) {
   return PostRepository(firestore: ref.watch(firestoreProvider));
@@ -43,6 +44,38 @@ class PostRepository {
   FutureVoid deletePost(Post post) async {
     try {
       return right(_posts.doc(post.id).delete());
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  FutureVoid updateUpVote(Post post, String uid, bool doesExist) async {
+    try {
+      if (!doesExist) {
+        if (post.downVotes.contains(uid)) updateDownVote(post, uid, true);
+        return right(_posts.doc(post.id).update({
+          'upVotes': FieldValue.arrayUnion([uid])
+        }));
+      }
+      return right(_posts.doc(post.id).update({
+        'upVotes': FieldValue.arrayRemove([uid])
+      }));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  FutureVoid updateDownVote(Post post, String uid, bool doesExist) async {
+    try {
+      if (!doesExist) {
+        if (post.upVotes.contains(uid)) updateUpVote(post, uid, true);
+        return right(_posts.doc(post.id).update({
+          'downVotes': FieldValue.arrayUnion([uid])
+        }));
+      }
+      return right(_posts.doc(post.id).update({
+        'downVotes': FieldValue.arrayRemove([uid])
+      }));
     } catch (e) {
       return left(Failure(e.toString()));
     }
