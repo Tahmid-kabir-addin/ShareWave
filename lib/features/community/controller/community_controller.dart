@@ -9,6 +9,7 @@ import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/community/repository/community_repository.dart';
 import 'package:reddit/models/community_model.dart';
 import 'package:reddit/models/post_model.dart';
+import 'package:reddit/models/user_model.dart';
 import 'package:reddit/utils.dart';
 import 'package:routemaster/routemaster.dart';
 
@@ -16,8 +17,8 @@ final searchCommunityProvider = StreamProvider.family((ref, String query) {
   return ref.watch(communityControllerProvider.notifier).searchCommunity(query);
 });
 
-final userCommunitiesProvider = StreamProvider((ref) {
-  return ref.watch(communityControllerProvider.notifier).getUserCommunities();
+final userCommunitiesProvider = StreamProvider.family((ref, String userId) {
+  return ref.watch(communityControllerProvider.notifier).getUserCommunities(userId);
 });
 
 final getCommunityByNameProvider = StreamProvider.family((ref, String name) {
@@ -92,10 +93,9 @@ class CommunityController extends StateNotifier<bool> {
     }
   }
 
-  Stream<List<Community>> getUserCommunities() {
+  Stream<List<Community>> getUserCommunities(String userId) {
     // state = true;
-    final uid = _ref.read(userProvider)!.uid;
-    final communities = _communityRepository.getUserCommunities(uid);
+    final communities = _communityRepository.getUserCommunities(userId);
     // state = false;
     return communities;
   }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/core/common/error_text.dart';
 import 'package:reddit/core/common/loader.dart';
+import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/community/controller/community_controller.dart';
 import 'package:reddit/features/post/controller/post_controller.dart';
 import 'package:reddit/models/community_model.dart';
@@ -82,6 +83,7 @@ class _AddPostTypeScreenState extends ConsumerState<AddPostTypeScreen> {
     final isTypeLink = widget.type == 'link';
 
     bool isLoading = ref.watch(postControllerProvider);
+    final user = ref.watch(userProvider)!;
 
     return isLoading
         ? const Loader()
@@ -170,7 +172,7 @@ class _AddPostTypeScreenState extends ConsumerState<AddPostTypeScreen> {
                     height: 20,
                   ),
                   const Text("Select Community"),
-                  ref.watch(userCommunitiesProvider).when(
+                  ref.watch(userCommunitiesProvider(user.uid)).when(
                       data: (data) {
                         if (data.isEmpty) return const SizedBox();
                         _communities = data;

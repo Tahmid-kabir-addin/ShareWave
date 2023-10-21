@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/core/common/error_text.dart';
 import 'package:reddit/core/common/loader.dart';
+import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/community/controller/community_controller.dart';
 import 'package:reddit/features/user/user_controller.dart';
 import 'package:routemaster/routemaster.dart';
@@ -24,7 +25,7 @@ class _CommunityListDrawerState extends ConsumerState<CommunityListDrawer> {
 
   @override
   Widget build(BuildContext context) {
-
+    final user = ref.watch(userProvider)!;
     return Drawer(
       child: SafeArea(
         child: Column(
@@ -36,7 +37,7 @@ class _CommunityListDrawerState extends ConsumerState<CommunityListDrawer> {
               ),
               onTap: () => navigateToCreateCommunityScreen(context),
             ),
-            ref.watch(userCommunitiesProvider).when(
+            ref.watch(userCommunitiesProvider(user.uid)).when(
                 data: (communities) => Expanded(
                   child: ListView.builder(
                     itemBuilder: (BuildContext context, int index) {

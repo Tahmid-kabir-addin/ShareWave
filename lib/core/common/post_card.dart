@@ -24,7 +24,7 @@ class PostCard extends ConsumerWidget {
     final user = ref.watch(userProvider)!;
 
     void deletePost(Post post) {
-      ref.watch(postControllerProvider.notifier).deletePost(post, context);
+      ref.watch(postControllerProvider.notifier).deletePost(user, post, context);
     }
 
     void updateVote(String uid, Post post, String voteType) {

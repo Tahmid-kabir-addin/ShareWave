@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reddit/core/enums/enums.dart';
+import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/user/repository/user_repository.dart';
 import 'package:reddit/models/post_model.dart';
 import 'package:reddit/models/user_model.dart';
@@ -68,5 +70,12 @@ class UserController extends StateNotifier<bool> {
 
   Stream<List<Post>> getUserOwnedPosts(String uid) {
     return _userRepository.getUserOwnedPosts(uid);
+  }
+
+  void updateUserKarma(UserModel user, UserKarma karma, BuildContext context) async {
+    user.copyWith(karma: user.karma + karma.karma);
+    final res = await _userRepository.updateUserKarma(user.uid, karma.karma);
+    res.fold((l) => showSnackBar(context, l.message),
+        (r) => _ref.watch(userProvider.notifier).update((state) => user));
   }
 }

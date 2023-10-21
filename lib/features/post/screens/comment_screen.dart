@@ -42,47 +42,59 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider)!;
     return Scaffold(
-      appBar: AppBar(),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text("Post"),
+      ),
       body: ref.watch(getPostByIdProvider(widget.postId)).when(
             data: (data) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    PostCard(post: data),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    TextField(
-                      onSubmitted: (val) => addComment(context, user, data.id),
-                      controller: _commentController,
-                      decoration: const InputDecoration(
-                        filled: true,
-                        hintText: "Add your thoughts here",
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(18),
+              return NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return [];
+                },
+                body: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      PostCard(post: data),
+                      const SizedBox(
+                        height: 20,
                       ),
-                      // maxLength: 150,
-                    ),
-                    ref.watch(allCommentsByPostIdProvider(widget.postId)).when(
-                        data: (data) {
-                          print(data);
-                          return Expanded(
-                            child: ListView.builder(
-                              itemCount: data.length,
-                              itemBuilder: (context, index) {
-                                Comment comment = data[index];
-                                return CommentCard(
-                                  comment: comment,
+                      TextField(
+                        onSubmitted: (val) =>
+                            addComment(context, user, data.id),
+                        controller: _commentController,
+                        decoration: const InputDecoration(
+                          filled: true,
+                          hintText: "Add your thoughts here",
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(18),
+                        ),
+                        // maxLength: 150,
+                      ),
+                      ref
+                          .watch(allCommentsByPostIdProvider(widget.postId))
+                          .when(
+                              data: (data) {
+                                print(data);
+                                return Expanded(
+                                  child: ListView.builder(
+                                    itemCount: data.length,
+                                    itemBuilder: (context, index) {
+                                      Comment comment = data[index];
+                                      return CommentCard(
+                                        comment: comment,
+                                      );
+                                    },
+                                  ),
                                 );
                               },
-                            ),
-                          );
-                        },
-                        error: (error, stackTrace) =>
-                            ErrorText(error: error.toString()),
-                        loading: () => const Loader()),
-                  ],
+                              error: (error, stackTrace) =>
+                                  ErrorText(error: error.toString()),
+                              loading: () => const Loader()),
+                    ],
+                  ),
                 ),
               );
             },

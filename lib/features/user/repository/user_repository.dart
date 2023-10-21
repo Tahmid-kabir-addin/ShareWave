@@ -46,4 +46,18 @@ class UserRepository {
               .toList(),
         );
   }
+
+  FutureVoid updateUserKarma(String uid, int karma) async {
+    try {
+      return right(
+        _users.doc(uid).update(
+          {
+            'karma': FieldValue.increment(karma),
+          },
+        ),
+      );
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
 }

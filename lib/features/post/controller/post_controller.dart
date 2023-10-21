@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:reddit/core/enums/enums.dart';
 import 'package:reddit/core/failure.dart';
 import 'package:reddit/core/providers/storage_repositoy.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/post/repository/post_repository.dart';
+import 'package:reddit/features/user/user_controller.dart';
 import 'package:reddit/models/comment_model.dart';
 import 'package:reddit/models/community_model.dart';
 import 'package:reddit/models/post_model.dart';
@@ -59,7 +61,10 @@ class PostController extends StateNotifier<bool> {
       required BuildContext context,
       required String description}) async {
     final postId = uid.v4();
-    final user = _ref.watch(userProvider);
+    final user = _ref.watch(userProvider)!;
+    _ref
+        .watch(userControllerProvider.notifier)
+        .updateUserKarma(user, UserKarma.textPost, context);
     state = false;
     Post post = Post(
         id: postId,
@@ -95,7 +100,10 @@ class PostController extends StateNotifier<bool> {
       required BuildContext context,
       required String link}) async {
     final postId = uid.v4();
-    final user = _ref.watch(userProvider);
+    final user = _ref.watch(userProvider)!;
+    _ref
+        .watch(userControllerProvider.notifier)
+        .updateUserKarma(user, UserKarma.linkPost, context);
     state = false;
     Post post = Post(
         id: postId,
@@ -130,7 +138,10 @@ class PostController extends StateNotifier<bool> {
       required BuildContext context,
       required File? imageFile}) async {
     final postId = uid.v4();
-    final user = _ref.watch(userProvider);
+    final user = _ref.watch(userProvider)!;
+    _ref
+        .watch(userControllerProvider.notifier)
+        .updateUserKarma(user, UserKarma.imagePost, context);
     state = false;
     final imageRes = await _storageRepository.storeFile(
         path: 'posts/${selectedCommunity.name}/', id: postId, file: imageFile);
@@ -172,12 +183,16 @@ class PostController extends StateNotifier<bool> {
     return Stream.value([]);
   }
 
-  void deletePost(Post post, BuildContext context) async {
+  void deletePost(UserModel user, Post post, BuildContext context) async {
     state = false;
     final res = await _postRepository.deletePost(post);
     state = true;
-    res.fold((l) => showSnackBar(context, "Deletion Failed!"),
-        (r) => showSnackBar(context, "Successfully Deleted!"));
+    res.fold((l) => showSnackBar(context, "Deletion Failed!"), (r) {
+      _ref
+          .watch(userControllerProvider.notifier)
+          .updateUserKarma(user, UserKarma.deletePost, context);
+      showSnackBar(context, "Successfully Deleted!");
+    });
   }
 
   void updateVote(
@@ -222,12 +237,13 @@ class PostController extends StateNotifier<bool> {
     final res = await _postRepository.addComment(comment);
 
     res.fold((l) => showSnackBar(context, "Comment Failed!"), (r) {
+      _ref.watch(userControllerProvider.notifier).updateUserKarma(user, UserKarma.comment, context);
       showSnackBar(context, "Commented Successfylly!");
     });
   }
 
   Stream<List<Comment>> getAllCommentsByPostId(String postId) {
-    final res =_postRepository.getAllCommentsByPostId(postId);
+    final res = _postRepository.getAllCommentsByPostId(postId);
     print("----------%%%%%%%%%----------\n");
     // print(res.first.toString());
     return res;

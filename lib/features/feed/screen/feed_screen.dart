@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/core/common/error_text.dart';
 import 'package:reddit/core/common/loader.dart';
 import 'package:reddit/core/common/post_card.dart';
+import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/community/controller/community_controller.dart';
 import 'package:reddit/features/post/controller/post_controller.dart';
 
@@ -16,7 +17,8 @@ class FeedScreen extends ConsumerStatefulWidget {
 class _FeedScreenState extends ConsumerState<FeedScreen> {
   @override
   Widget build(BuildContext context) {
-    return ref.watch(userCommunitiesProvider).when(
+    final user = ref.watch(userProvider)!;
+    return ref.watch(userCommunitiesProvider(user.uid)).when(
           data: (data) => ref.watch(userPostsProvider(data)).when(
               data: (data) {
                 return ListView.builder(
