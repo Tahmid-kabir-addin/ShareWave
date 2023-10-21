@@ -6,6 +6,7 @@ import 'package:reddit/core/failure.dart';
 import 'package:reddit/core/providers/firebase_providers.dart';
 import 'package:reddit/core/type_defs.dart';
 import 'package:reddit/models/community_model.dart';
+import 'package:reddit/models/post_model.dart';
 
 // Define a provider for the CommunityRepository.
 final communityRepositoryProvider = Provider((ref) {
@@ -21,6 +22,9 @@ class CommunityRepository {
   // Reference to the 'communities' collection in Firestore.
   CollectionReference get _communities =>
       _fireStore.collection(FirebaseConstants.communitiesCollection);
+
+  CollectionReference get _posts =>
+      _fireStore.collection(FirebaseConstants.postsCollection);
 
   // Function to create a new community in Firestore.
   FutureVoid createCommunity(Community community) async {
@@ -117,4 +121,17 @@ class CommunityRepository {
     }
   }
 
+  Stream<List<Post>> getCommunityPosts(String communityName) {
+    return _posts
+        .where('communityName', isEqualTo: communityName)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map(
+          (event) => event.docs
+          .map(
+            (e) => Post.fromMap(e.data() as Map<String, dynamic>),
+      )
+          .toList(),
+    );
+  }
 }

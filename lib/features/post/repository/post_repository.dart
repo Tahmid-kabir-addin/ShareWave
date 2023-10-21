@@ -7,7 +7,7 @@ import 'package:reddit/core/providers/firebase_providers.dart';
 import 'package:reddit/core/type_defs.dart';
 import 'package:reddit/models/community_model.dart';
 import 'package:reddit/models/post_model.dart';
-import 'package:reddit/models/user_model.dart';
+import 'package:reddit/models/comment_model.dart';
 
 final postRepositoryProvider = Provider((ref) {
   return PostRepository(firestore: ref.watch(firestoreProvider));
@@ -21,6 +21,9 @@ class PostRepository {
 
   CollectionReference get _posts =>
       _firestore.collection(FirebaseConstants.postsCollection);
+
+  CollectionReference get _comments =>
+      _firestore.collection(FirebaseConstants.commentsCollection);
 
   FutureVoid addPost(Post post) async {
     try {
@@ -79,5 +82,36 @@ class PostRepository {
     } catch (e) {
       return left(Failure(e.toString()));
     }
+  }
+
+  Stream<Post> getPostById(String postId) {
+    return _posts
+        .doc(postId)
+        .snapshots()
+        .map((event) => Post.fromMap(event.data() as Map<String, dynamic>));
+  }
+
+  FutureVoid addComment(Comment comment) async {
+    try {
+      await _comments.doc(comment.id).set(comment.toMap());
+      return right(_posts
+          .doc(comment.postId)
+          .update({'commentCount': FieldValue.increment(1)}));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  Stream<List<Comment>> getAllCommentsByPostId(String postId) {
+    return _comments
+        .where('postId', isEqualTo: postId)
+        .orderBy(
+          'createdAt',
+          descending: true,
+        )
+        .snapshots()
+        .map((event) => event.docs
+            .map((e) => Comment.fromMap(e.data() as Map<String, dynamic>))
+            .toList());
   }
 }

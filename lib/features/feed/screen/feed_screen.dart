@@ -17,20 +17,21 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   @override
   Widget build(BuildContext context) {
     return ref.watch(userCommunitiesProvider).when(
-        data: (data) => ref.watch(userPostsProvider(data)).when(
-            data: (data) {
-              return ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  final post = data[index];
-                  // print(post);
-                  return PostCard(post: post);
-                },
-              );
-            },
-            error: (error, stackTrace) => ErrorText(error: error.toString()),
-            loading: () => const Loader()),
-        error: (error, stackTrace) => ErrorText(error: error.toString()),
-        loading: () => const Loader());
+          data: (data) => ref.watch(userPostsProvider(data)).when(
+              data: (data) {
+                return ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    final post = data[index];
+                    // print(post);
+                    return PostCard(post: post);
+                  },
+                );
+              },
+              error: (error, stackTrace) => ErrorText(error: error.toString()),
+              loading: () => const Loader()),
+          error: (error, stackTrace) => ErrorText(error: error.toString()),
+          loading: () => const Loader(),
+        );
   }
 }

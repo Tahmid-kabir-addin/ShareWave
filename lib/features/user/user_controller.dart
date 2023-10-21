@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/features/user/repository/user_repository.dart';
+import 'package:reddit/models/post_model.dart';
 import 'package:reddit/models/user_model.dart';
 import 'package:routemaster/routemaster.dart';
 
@@ -15,6 +16,10 @@ final userControllerProvider =
       userRepository: ref.watch(userRepositoryProvider),
       ref: ref,
       storageRepository: ref.watch(storageRepositoryProvider));
+});
+
+final userOwnedPostsProvider = StreamProvider.family((ref, String uid) {
+  return ref.watch(userControllerProvider.notifier).getUserOwnedPosts(uid);
 });
 
 class UserController extends StateNotifier<bool> {
@@ -35,7 +40,8 @@ class UserController extends StateNotifier<bool> {
       {required UserModel user,
       required File? profileFile,
       required File? bannerFile,
-      required BuildContext context, required String name}) async {
+      required BuildContext context,
+      required String name}) async {
     state = true;
     // path: community/profile/{name}
     if (profileFile != null) {
@@ -52,11 +58,15 @@ class UserController extends StateNotifier<bool> {
       res.fold((l) => showSnackBar(context, l.message),
           (r) => user = user.copyWith(banner: r));
     }
-    if(name.isNotEmpty) user = user.copyWith(name: name);
+    if (name.isNotEmpty) user = user.copyWith(name: name);
 
     final res = await _userRepository.editUser(user);
     state = false;
     res.fold((l) => showSnackBar(context, l.message),
         (r) => Routemaster.of(context).pop());
+  }
+
+  Stream<List<Post>> getUserOwnedPosts(String uid) {
+    return _userRepository.getUserOwnedPosts(uid);
   }
 }

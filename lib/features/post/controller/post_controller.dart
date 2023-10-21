@@ -5,11 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:reddit/core/failure.dart';
 import 'package:reddit/core/providers/storage_repositoy.dart';
-import 'package:reddit/core/type_defs.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/post/repository/post_repository.dart';
+import 'package:reddit/models/comment_model.dart';
 import 'package:reddit/models/community_model.dart';
 import 'package:reddit/models/post_model.dart';
+import 'package:reddit/models/user_model.dart';
 import 'package:reddit/utils.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:uuid/uuid.dart';
@@ -25,6 +26,16 @@ final postControllerProvider =
 final userPostsProvider =
     StreamProvider.family((ref, List<Community> communities) {
   return ref.watch(postControllerProvider.notifier).getUserPosts(communities);
+});
+
+final getPostByIdProvider = StreamProvider.family((ref, String postId) {
+  return ref.watch(postControllerProvider.notifier).getPostById(postId);
+});
+
+final allCommentsByPostIdProvider = StreamProvider.family((ref, String postId) {
+  return ref
+      .watch(postControllerProvider.notifier)
+      .getAllCommentsByPostId(postId);
 });
 
 class PostController extends StateNotifier<bool> {
@@ -187,5 +198,38 @@ class PostController extends StateNotifier<bool> {
     }
     res.fold((l) => showSnackBar(context, 'Voting Failed!'),
         (r) => showSnackBar(context, 'Vote Updated Successfully!'));
+  }
+
+  Stream<Post> getPostById(String postId) {
+    return _postRepository.getPostById(postId);
+  }
+
+  void addComment(
+      {required BuildContext context,
+      required UserModel user,
+      required String text,
+      required String postId}) async {
+    final commentId = uid.v4();
+
+    final comment = Comment(
+        id: commentId,
+        text: text,
+        postId: postId,
+        userName: user.name,
+        userProfilePic: user.profilePic,
+        createdAt: DateTime.now());
+
+    final res = await _postRepository.addComment(comment);
+
+    res.fold((l) => showSnackBar(context, "Comment Failed!"), (r) {
+      showSnackBar(context, "Commented Successfylly!");
+    });
+  }
+
+  Stream<List<Comment>> getAllCommentsByPostId(String postId) {
+    final res =_postRepository.getAllCommentsByPostId(postId);
+    print("----------%%%%%%%%%----------\n");
+    // print(res.first.toString());
+    return res;
   }
 }
