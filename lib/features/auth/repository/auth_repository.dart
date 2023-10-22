@@ -37,19 +37,25 @@ class AuthRepository {
 
   Stream<User?> get authStateChange => _auth.authStateChanges();
 
-  FutureEither<UserModel> signInWithGoogle() async {
+  FutureEither<UserModel> signInWithGoogle(bool isFromLogin) async {
     try {
-      print('Inside signInWithGoogle of auth_repository class');
-
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       final googleAuth = (await googleUser?.authentication);
 
       final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
 
-      UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
+      UserCredential userCredential;
+
+      if (isFromLogin) {
+        userCredential = await _auth.signInWithCredential(credential);
+      } else {
+        userCredential =
+            await _auth.currentUser!.linkWithCredential(credential);
+      }
 
       UserModel userModel;
       // print(userCredential.user?.email);
@@ -80,6 +86,28 @@ class AuthRepository {
         print("old user calling getUserData auth_repo");
         userModel = await getUserData(userCredential.user!.uid).first;
       }
+      return right(userModel);
+    } catch (E) {
+      print(E);
+      return left(Failure(E.toString()));
+    }
+  }
+
+  FutureEither<UserModel> signInAsGuest() async {
+    try {
+      UserCredential userCredential = await _auth.signInAnonymously();
+
+      UserModel userModel = UserModel(
+        name: 'Guest',
+        profilePic: Constants.avatarDefault,
+        banner: Constants.bannerDefault,
+        uid: userCredential.user!.uid,
+        isAuthenticated: false,
+        karma: 0,
+        awards: [],
+      );
+
+      await _users.doc(userCredential.user!.uid).set(userModel.toMap());
       return right(userModel);
     } catch (E) {
       print(E);

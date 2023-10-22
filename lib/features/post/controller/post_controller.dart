@@ -29,6 +29,9 @@ final userPostsProvider =
     StreamProvider.family((ref, List<Community> communities) {
   return ref.watch(postControllerProvider.notifier).getUserPosts(communities);
 });
+final guestPostsProvider = StreamProvider((ref) {
+  return ref.watch(postControllerProvider.notifier).getGuestPosts();
+});
 
 final getPostByIdProvider = StreamProvider.family((ref, String postId) {
   return ref.watch(postControllerProvider.notifier).getPostById(postId);
@@ -180,6 +183,11 @@ class PostController extends StateNotifier<bool> {
     if (communities.isNotEmpty) {
       return _postRepository.getUserPosts(communities);
     }
+    return Stream.value([]);
+  }
+
+  Stream<List<Post>> getGuestPosts() {
+    return _postRepository.getGuestPosts();
     return Stream.value([]);
   }
 

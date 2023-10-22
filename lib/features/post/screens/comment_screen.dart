@@ -41,6 +41,7 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider)!;
+    final isGuest = !user.isAuthenticated;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -61,6 +62,7 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
                       const SizedBox(
                         height: 20,
                       ),
+                      if(!isGuest)
                       TextField(
                         onSubmitted: (val) =>
                             addComment(context, user, data.id),

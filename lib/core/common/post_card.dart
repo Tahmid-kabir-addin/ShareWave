@@ -22,6 +22,7 @@ class PostCard extends ConsumerWidget {
     final isTypeText = post.type == 'text';
     final isTypeLink = post.type == 'link';
     final user = ref.watch(userProvider)!;
+    final isGuest = !user.isAuthenticated;
 
     void deletePost(Post post) {
       ref
@@ -44,6 +45,7 @@ class PostCard extends ConsumerWidget {
     }
 
     void navigateToCommentScreen(BuildContext context, String postId) {
+      // print('ok');
       Routemaster.of(context).push('post/$postId/comments');
     }
 
@@ -198,7 +200,7 @@ class PostCard extends ConsumerWidget {
                         Row(
                           children: [
                             IconButton(
-                              onPressed: () =>
+                              onPressed: isGuest? () {}: () =>
                                   updateVote(user.uid, post, 'upVote'),
                               icon: Icon(
                                 Constants.up,
@@ -215,7 +217,7 @@ class PostCard extends ConsumerWidget {
                               ),
                             ),
                             IconButton(
-                              onPressed: () =>
+                              onPressed: isGuest? () {}: () =>
                                   updateVote(user.uid, post, 'downVote'),
                               icon: Icon(
                                 Constants.down,
@@ -235,7 +237,7 @@ class PostCard extends ConsumerWidget {
                               const Icon(
                                 Icons.comment,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 10,
                               ),
                               Text(
@@ -265,7 +267,7 @@ class PostCard extends ConsumerWidget {
                               loading: () => const Loader(),
                             ),
                         IconButton(
-                          onPressed: () {
+                          onPressed: isGuest? () {}:() {
                             showDialog(
                               context: context,
                               builder: (context) {

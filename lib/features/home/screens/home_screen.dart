@@ -18,6 +18,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _page = 0;
+
   void displayDrawer(BuildContext context) {
     Scaffold.of(context).openDrawer();
   }
@@ -34,19 +35,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void initState() {
-    // final communities = ref.read(userCommunitiesProvider);
-    // print(communities);
-    // setState(() {
-    //
-    // });
     super.initState();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(userProvider);
+    final user = ref.watch(userProvider)!;
+    final isGuest = !user.isAuthenticated;
 
     return Scaffold(
       appBar: AppBar(
@@ -67,7 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               icon: CircleAvatar(
                 backgroundImage: NetworkImage(user!.profilePic),
               ),
-              onPressed: () => displayEndDrawer(context),
+              onPressed: () => isGuest ? null : displayEndDrawer(context),
             );
           }),
         ],
@@ -81,20 +76,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: Constants.tabWidgets[_page],
       drawer: const CommunityListDrawer(),
       endDrawer: const ProfileIconDrawer(),
-      bottomNavigationBar: CupertinoTabBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-          ),
-        ],
-        onTap: onPageChange,
-        currentIndex: _page,
-        activeColor: Colors.white,
-        backgroundColor: Pallete.darkModeAppTheme.backgroundColor,
-      ),
+      bottomNavigationBar: isGuest
+          ? null
+          : CupertinoTabBar(
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.add),
+                ),
+              ],
+              onTap: onPageChange,
+              currentIndex: _page,
+              activeColor: Colors.white,
+              backgroundColor: Pallete.darkModeAppTheme.backgroundColor,
+            ),
     );
   }
 }
