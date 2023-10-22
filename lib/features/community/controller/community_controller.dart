@@ -8,6 +8,8 @@ import 'package:reddit/core/providers/storage_repositoy.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
 import 'package:reddit/features/community/repository/community_repository.dart';
 import 'package:reddit/models/community_model.dart';
+import 'package:reddit/models/post_model.dart';
+import 'package:reddit/models/user_model.dart';
 import 'package:reddit/utils.dart';
 import 'package:routemaster/routemaster.dart';
 
@@ -15,8 +17,8 @@ final searchCommunityProvider = StreamProvider.family((ref, String query) {
   return ref.watch(communityControllerProvider.notifier).searchCommunity(query);
 });
 
-final userCommunitiesProvider = StreamProvider((ref) {
-  return ref.watch(communityControllerProvider.notifier).getUserCommunities();
+final userCommunitiesProvider = StreamProvider.family((ref, String userId) {
+  return ref.watch(communityControllerProvider.notifier).getUserCommunities(userId);
 });
 
 final getCommunityByNameProvider = StreamProvider.family((ref, String name) {
@@ -24,7 +26,12 @@ final getCommunityByNameProvider = StreamProvider.family((ref, String name) {
       .watch(communityControllerProvider.notifier)
       .getCommunityByName(name);
 });
-
+final communityPostsProvider =
+    StreamProvider.family((ref, String communityName) {
+  return ref
+      .watch(communityControllerProvider.notifier)
+      .getCommunityPosts(communityName);
+});
 final communityControllerProvider =
     StateNotifierProvider<CommunityController, bool>((ref) {
   return CommunityController(
@@ -77,18 +84,20 @@ class CommunityController extends StateNotifier<bool> {
       print("${community.name} ${uid!}");
       final res = await _communityRepository.joinCommunity(community.name, uid);
       res.fold((l) => showSnackBar(context, l.message),
-              (r) => showSnackBar(context, 'Community Joined Successfully!'));
+          (r) => showSnackBar(context, 'Community Joined Successfully!'));
     } else {
       final res =
-      await _communityRepository.leaveCommunity(community.name, uid!);
+          await _communityRepository.leaveCommunity(community.name, uid!);
       res.fold((l) => showSnackBar(context, l.message),
-              (r) => showSnackBar(context, "Community Left Successfully!"));
+          (r) => showSnackBar(context, "Community Left Successfully!"));
     }
   }
 
-  Stream<List<Community>> getUserCommunities() {
-    final uid = _ref.read(userProvider)!.uid;
-    return _communityRepository.getUserCommunities(uid);
+  Stream<List<Community>> getUserCommunities(String userId) {
+    // state = true;
+    final communities = _communityRepository.getUserCommunities(userId);
+    // state = false;
+    return communities;
   }
 
   Stream<Community> getCommunityByName(String name) {
@@ -125,8 +134,16 @@ class CommunityController extends StateNotifier<bool> {
     res.fold((l) => showSnackBar(context, l.message),
         (r) => Routemaster.of(context).pop());
   }
-  void addModsToCommunity(BuildContext context, String communityName, List<String> uids) async {
-    final res = await _communityRepository.addModsToCommunity(communityName, uids);
-    res.fold((l) => showSnackBar(context, l.message), (r) => Routemaster.of(context).pop());
+
+  void addModsToCommunity(
+      BuildContext context, String communityName, List<String> uids) async {
+    final res =
+        await _communityRepository.addModsToCommunity(communityName, uids);
+    res.fold((l) => showSnackBar(context, l.message),
+        (r) => Routemaster.of(context).pop());
+  }
+
+  Stream<List<Post>> getCommunityPosts(String communityName) {
+    return _communityRepository.getCommunityPosts(communityName);
   }
 }

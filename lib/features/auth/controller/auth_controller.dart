@@ -11,12 +11,12 @@ final userProvider = StateProvider<UserModel?>((ref) {
 });
 
 // ref.watch: every time the authRepositoryProvider changes it will update
-final authControllerProvider = StateNotifierProvider<AuthController, bool>(
-    (ref) {
-      print("Inside AuthControllerProvider");
-      return AuthController(
-          authRepository: ref.watch(authRepositoryProvider), ref: ref);
-    });
+final authControllerProvider =
+    StateNotifierProvider<AuthController, bool>((ref) {
+  print("Inside AuthControllerProvider");
+  return AuthController(
+      authRepository: ref.watch(authRepositoryProvider), ref: ref);
+});
 
 final authStateChangeProvider = StreamProvider((ref) {
   print("inside authStateChangeProvider");
@@ -41,15 +41,20 @@ class AuthController extends StateNotifier<bool> {
 
   Stream<User?> get authStateChange => _authRepository.authStateChange;
 
-  void signInWithGoogle(BuildContext context) async {
-    print("Inside signInWithGoogle method of auth_controller class");
+  void signInWithGoogle(BuildContext context, bool isFromLogin) async {
     state = true;
-    print("calling auth_repository signInWithGoogle");
-    final user = await _authRepository.signInWithGoogle();
-    print("back from auth_repository signInWithGoogle");
+    final user = await _authRepository.signInWithGoogle(isFromLogin);
     state = false;
     user.fold((l) => showSnackBar(context, l.message), (userModel) {
-      print('Reading and updating userProvider with userModel');
+      _ref.read(userProvider.notifier).update((state) => userModel);
+    });
+  }
+
+  void signInAsGuest(BuildContext context) async {
+    state = true;
+    final user = await _authRepository.signInAsGuest();
+    state = false;
+    user.fold((l) => showSnackBar(context, l.message), (userModel) {
       _ref.read(userProvider.notifier).update((state) => userModel);
     });
   }
