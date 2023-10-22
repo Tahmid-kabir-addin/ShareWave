@@ -237,7 +237,9 @@ class PostController extends StateNotifier<bool> {
     final res = await _postRepository.addComment(comment);
 
     res.fold((l) => showSnackBar(context, "Comment Failed!"), (r) {
-      _ref.watch(userControllerProvider.notifier).updateUserKarma(user, UserKarma.comment, context);
+      _ref
+          .watch(userControllerProvider.notifier)
+          .updateUserKarma(user, UserKarma.comment, context);
       showSnackBar(context, "Commented Successfylly!");
     });
   }
@@ -247,5 +249,21 @@ class PostController extends StateNotifier<bool> {
     print("----------%%%%%%%%%----------\n");
     // print(res.first.toString());
     return res;
+  }
+
+  void awardPost(
+      UserModel user, String award, BuildContext context, Post post) async {
+    final res = await _postRepository.awardPost(post, award, user.uid);
+
+    res.fold((l) => showSnackBar(context, l.message), (r) {
+      _ref
+          .watch(userControllerProvider.notifier)
+          .updateUserKarma(user, UserKarma.awardPost, context);
+      _ref.watch(userProvider.notifier).update((state) {
+        state?.awards.remove(award);
+        return state;
+      });
+      Routemaster.of(context).pop();
+    });
   }
 }

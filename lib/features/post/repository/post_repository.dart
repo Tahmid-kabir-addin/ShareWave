@@ -25,6 +25,9 @@ class PostRepository {
   CollectionReference get _comments =>
       _firestore.collection(FirebaseConstants.commentsCollection);
 
+  CollectionReference get _users =>
+      _firestore.collection(FirebaseConstants.usersCollection);
+
   FutureVoid addPost(Post post) async {
     try {
       return right(_posts.doc(post.id).set(post.toMap()));
@@ -113,5 +116,21 @@ class PostRepository {
         .map((event) => event.docs
             .map((e) => Comment.fromMap(e.data() as Map<String, dynamic>))
             .toList());
+  }
+
+  FutureVoid awardPost(Post post, String award, String senderId) async {
+    try {
+      await _posts.doc(post.id).update({
+        'awards': FieldValue.arrayUnion([award]),
+      });
+      await _users.doc(senderId).update({
+        'awards': FieldValue.arrayRemove([award]),
+      });
+      return right(_users.doc(post.uid).update({
+        'awards': FieldValue.arrayUnion([award]),
+      }));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
   }
 }
