@@ -16,12 +16,7 @@ ShareWave is a Reddit-inspired mobile application built with Flutter. The app le
 ## Screenshots
 
 Here are some screenshots of the ShareWave app:
-<figure>
-  <img
-  src="https://i.imgur.com/ayzxnSf.jpg"
-  alt="The beautiful MDN logo.">
-  <figcaption>MDN Logo</figcaption>
-</figure>
+
 ![Screenshot 1](https://i.imgur.com/ayzxnSf.jpg)
 ![Screenshot 2](https://i.imgur.com/EDjHayr.jpg)
 ![Screenshot 3](https://i.imgur.com/YIfhugQ.jpg)
